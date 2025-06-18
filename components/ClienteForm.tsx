@@ -1,172 +1,265 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useCliente } from '../context/ClienteContext';
-import { postCliente } from '../lib/api';
+import { UserIcon, EnvelopeIcon, PhoneIcon, PhotoIcon } from '@heroicons/react/24/outline';
+
+const ESTADOS_MEXICO = [
+  'Aguascalientes', 'Baja California', 'Baja California Sur', 'Campeche', 'Chiapas', 'Chihuahua',
+  'Ciudad de México', 'Coahuila', 'Colima', 'Durango', 'Estado de México', 'Guanajuato', 'Guerrero',
+  'Hidalgo', 'Jalisco', 'Michoacán', 'Morelos', 'Nayarit', 'Nuevo León', 'Oaxaca', 'Puebla',
+  'Querétaro', 'Quintana Roo', 'San Luis Potosí', 'Sinaloa', 'Sonora', 'Tabasco', 'Tamaulipas',
+  'Tlaxcala', 'Veracruz', 'Yucatán', 'Zacatecas',
+];
 
 export default function ClienteForm() {
-  const router = useRouter();
-  const { setCliente } = useCliente();
-
-  const [formData, setFormData] = useState({
-    nombre: '',
-    apellido: '',
-    correo: '',
-    telefono: '',
-    direccion: {
-      calle: '',
-      numero: '',
-      ciudad: '',
-      estado: '',
-      pais: 'México',
-      cp: '',
-    },
+  const [form, setForm] = useState({
+    nombre: '', apellido: '', nacimiento: '', correo: '', telefono: '',
+    direccion: { calle: '', numero: '', ciudad: '', estado: '', pais: 'México', cp: '' },
   });
-
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [foto, setFoto] = useState<File | null>(null);
+  const [errors, setErrors] = useState<{ [k: string]: string }>({});
   const [loading, setLoading] = useState(false);
 
-  const validate = () => {
-    const newErrors: any = {};
-
-    if (!formData.nombre) newErrors.nombre = 'Requerido';
-    if (!formData.apellido) newErrors.apellido = 'Requerido';
-    if (!formData.correo || !/\S+@\S+\.\S+/.test(formData.correo)) newErrors.correo = 'Correo inválido';
-    if (!formData.telefono || formData.telefono.length < 10) newErrors.telefono = 'Teléfono inválido';
-    const dir = formData.direccion;
-    if (!dir.calle) newErrors.calle = 'Requerido';
-    if (!dir.numero) newErrors.numero = 'Requerido';
-    if (!dir.ciudad) newErrors.ciudad = 'Requerido';
-    if (!dir.estado) newErrors.estado = 'Requerido';
-    if (!dir.cp) newErrors.cp = 'Requerido';
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleChange = (e: any) => {
+  const handleInput = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    if (name in formData.direccion) {
-      setFormData(prev => ({
-        ...prev,
-        direccion: { ...prev.direccion, [name]: value },
-      }));
+    if (name in form.direccion) {
+      setForm(f => ({ ...f, direccion: { ...f.direccion, [name]: value } }));
     } else {
-      setFormData(prev => ({ ...prev, [name]: value }));
+      setForm(f => ({ ...f, [name]: value }));
     }
   };
 
-  const handleSubmit = async (e: any) => {
+  const validate = () => {
+    const err: any = {};
+    if (!form.nombre) err.nombre = 'Requerido';
+    if (!form.apellido) err.apellido = 'Requerido';
+    if (!form.nacimiento) err.nacimiento = 'Requerido';
+    if (!form.correo || !/\S+@\S+\.\S+/.test(form.correo)) err.correo = 'Correo inválido';
+    if (!form.telefono || form.telefono.length < 10) err.telefono = 'Teléfono inválido';
+    const dir = form.direccion;
+    if (!dir.calle) err.calle = 'Requerido';
+    if (!dir.numero) err.numero = 'Requerido';
+    if (!dir.ciudad) err.ciudad = 'Requerido';
+    if (!dir.estado) err.estado = 'Requerido';
+    if (!dir.pais) err.pais = 'Requerido';
+    if (!dir.cp) err.cp = 'Requerido';
+    setErrors(err);
+    return Object.keys(err).length === 0;
+  };
+
+  const handleFoto = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setFoto(e.target.files[0]);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
-
-    try {
-      setLoading(true);
-      const cliente = await postCliente(formData);
-      setCliente(cliente);
-      router.push('/membresias');
-    } catch (err) {
-      console.error('Error:', err);
-      alert('Ocurrió un error al registrar al cliente.');
-    } finally {
+    setLoading(true);
+    setTimeout(() => {
+      alert('Cliente guardado (demo)');
       setLoading(false);
-    }
+    }, 1000);
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label className="block">Nombre*</label>
-          <input
-            name="nombre"
-            value={formData.nombre}
-            onChange={handleChange}
-            className="input"
-          />
-          {errors.nombre && <p className="text-red-500 text-sm">{errors.nombre}</p>}
+      <form
+          onSubmit={handleSubmit}
+          className="
+        w-full
+        bg-white
+        rounded-2xl
+        p-4
+        md:p-8
+        shadow-lg
+        shadow-gray-500
+        mx-auto
+        max-w-[98vw]
+        md:max-w-6xl
+        lg:max-w-8xl
+        my-6
+      "
+      >
+        <h1 className="text-2xl font-bold mb-1">Alta de Cliente</h1>
+        <div className="text-gray-500 text-sm mb-6">
+          Ingresa los datos del nuevo cliente para registrarlo en el sistema
         </div>
-        <div>
-          <label className="block">Apellido*</label>
-          <input
-            name="apellido"
-            value={formData.apellido}
-            onChange={handleChange}
-            className="input"
-          />
-          {errors.apellido && <p className="text-red-500 text-sm">{errors.apellido}</p>}
-        </div>
-        <div>
-          <label className="block">Correo Electrónico*</label>
-          <input
-            name="correo"
-            value={formData.correo}
-            onChange={handleChange}
-            type="email"
-            className="input"
-          />
-          {errors.correo && <p className="text-red-500 text-sm">{errors.correo}</p>}
-        </div>
-        <div>
-          <label className="block">Teléfono*</label>
-          <input
-            name="telefono"
-            value={formData.telefono}
-            onChange={handleChange}
-            className="input"
-          />
-          {errors.telefono && <p className="text-red-500 text-sm">{errors.telefono}</p>}
-        </div>
-      </div>
+        {/* Foto y datos */}
+        <div className="flex flex-col md:flex-row gap-6 md:gap-12 items-start w-full">
 
-      <div className="border-t pt-4">
-        <h3 className="font-semibold mb-2">Dirección</h3>
+          {/* Foto */}
+          <div className="flex flex-col items-center w-full md:w-1/4 mb-2 md:mb-0">
+            <div className="w-28 h-28 rounded-xl border-2 border-dashed flex items-center justify-center bg-gray-50 mb-2 relative">
+              {foto ? (
+                  <img src={URL.createObjectURL(foto)} alt="Foto" className="w-full h-full object-cover rounded-xl" />
+              ) : (
+                  <UserIcon className="w-14 h-14 text-gray-400" />
+              )}
+              <label className="absolute -bottom-2 -right-2 bg-brown-400 rounded-full p-1 cursor-pointer shadow-md">
+                <PhotoIcon className="w-6 h-6 text-white" />
+                <input type="file" accept="image/*" className="hidden" onChange={handleFoto} />
+              </label>
+            </div>
+            <span className="text-xs text-gray-500">Foto del cliente</span>
+          </div>
+          {/* Inputs básicos */}
+          <div className="flex-1 grid grid-cols-1 gap-4 w-full">
+            <div>
+              <label className="font-semibold">Nombre*</label>
+              <input
+                  name="nombre" placeholder="Ingresa el nombre"
+                  value={form.nombre} onChange={handleInput}
+                  className={`input-form ${errors.nombre && 'border-red-400'}`}
+              />
+              {errors.nombre && <p className="text-xs text-red-500">{errors.nombre}</p>}
+            </div>
+            <div>
+              <label className="font-semibold">Apellido*</label>
+              <input
+                  name="apellido" placeholder="Ingresa el apellido"
+                  value={form.apellido} onChange={handleInput}
+                  className={`input-form ${errors.apellido && 'border-red-400'}`}
+              />
+              {errors.apellido && <p className="text-xs text-red-500">{errors.apellido}</p>}
+            </div>
+            <div>
+              <label className="font-semibold">Fecha de Nacimiento*</label>
+              <input
+                  name="nacimiento" type="date"
+                  value={form.nacimiento} onChange={handleInput}
+                  className={`input-form ${errors.nacimiento && 'border-red-400'}`}
+              />
+              {errors.nacimiento && <p className="text-xs text-red-500">{errors.nacimiento}</p>}
+            </div>
+          </div>
+        </div>
+        {/* Correo y Tel */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+          <div>
+            <label className="font-semibold">Correo Electrónico*</label>
+            <div className="relative">
+              <input
+                  name="correo" type="email"
+                  value={form.correo} onChange={handleInput}
+                  className={`input-form pl-12 ${errors.correo && 'border-red-400'}`}
+              />
+              <EnvelopeIcon className=" left-4 top-1/2 -translate-y-1/2 w-5 h-5 absolute text-gray-400" />
+            </div>
+            {errors.correo && <p className="text-xs text-red-500">{errors.correo}</p>}
+          </div>
+          <div>
+            <label className="font-semibold">Teléfono*</label>
+            <div className="relative">
+              <input
+                  name="telefono"
+                  value={form.telefono} onChange={handleInput}
+                  className={`input-form pl-10 ${errors.telefono && 'border-red-400'}`}
+              />
+              <PhoneIcon className="w-5 h-5 absolute left-3 top-2.5 text-gray-400" />
+            </div>
+            {errors.telefono && <p className="text-xs text-red-500">{errors.telefono}</p>}
+          </div>
+        </div>
+        <hr className="my-7" />
+        <h3 className="font-bold text-lg mb-3">Dirección</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label>Calle*</label>
-            <input name="calle" value={formData.direccion.calle} onChange={handleChange} className="input" />
-            {errors.calle && <p className="text-red-500 text-sm">{errors.calle}</p>}
+            <input name="calle" placeholder="Nombre de la calle"
+                   value={form.direccion.calle} onChange={handleInput}
+                   className={`input-form ${errors.calle && 'border-red-400'}`} />
+            {errors.calle && <p className="text-xs text-red-500">{errors.calle}</p>}
           </div>
           <div>
             <label>Número*</label>
-            <input name="numero" value={formData.direccion.numero} onChange={handleChange} className="input" />
-            {errors.numero && <p className="text-red-500 text-sm">{errors.numero}</p>}
+            <input name="numero" placeholder="Número exterior e interior"
+                   value={form.direccion.numero} onChange={handleInput}
+                   className={`input-form ${errors.numero && 'border-red-400'}`} />
+            {errors.numero && <p className="text-xs text-red-500">{errors.numero}</p>}
           </div>
           <div>
             <label>Ciudad*</label>
-            <input name="ciudad" value={formData.direccion.ciudad} onChange={handleChange} className="input" />
-            {errors.ciudad && <p className="text-red-500 text-sm">{errors.ciudad}</p>}
+            <input name="ciudad" placeholder="Ciudad"
+                   value={form.direccion.ciudad} onChange={handleInput}
+                   className={`input-form ${errors.ciudad && 'border-red-400'}`} />
+            {errors.ciudad && <p className="text-xs text-red-500">{errors.ciudad}</p>}
           </div>
           <div>
             <label>Estado*</label>
-            <input name="estado" value={formData.direccion.estado} onChange={handleChange} className="input" />
-            {errors.estado && <p className="text-red-500 text-sm">{errors.estado}</p>}
+            <select
+                name="estado"
+                value={form.direccion.estado}
+                onChange={handleInput}
+                className={`input-form ${errors.estado && 'border-red-400'}`}
+            >
+              <option value="">Selecciona un estado</option>
+              {ESTADOS_MEXICO.map(e => (
+                  <option key={e} value={e}>{e}</option>
+              ))}
+            </select>
+            {errors.estado && <p className="text-xs text-red-500">{errors.estado}</p>}
+          </div>
+          <div>
+            <label>País*</label>
+            <select
+                name="pais"
+                value={form.direccion.pais}
+                onChange={handleInput}
+                className={`input-form ${errors.pais && 'border-red-400'}`}
+            >
+              <option value="México">México</option>
+              {/* Puedes agregar más países aquí */}
+            </select>
           </div>
           <div>
             <label>Código Postal*</label>
-            <input name="cp" value={formData.direccion.cp} onChange={handleChange} className="input" />
-            {errors.cp && <p className="text-red-500 text-sm">{errors.cp}</p>}
+            <input name="cp" placeholder="Código postal"
+                   value={form.direccion.cp} onChange={handleInput}
+                   className={`input-form ${errors.cp && 'border-red-400'}`} />
+            {errors.cp && <p className="text-xs text-red-500">{errors.cp}</p>}
           </div>
         </div>
-      </div>
+        {/* Botones */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-8 w-full">
+          <button
+              type="submit"
+              disabled={loading}
+              className="w-full h-20 rounded-[15px] bg-[#9A6D42] hover:bg-[#85582a] text-white text-2xl font-normal flex items-center justify-center transition-colors"
+          >
+            {loading ? 'Guardando...' : 'Guardar Cliente'}
+          </button>
+          <button
+              type="button"
+              className="w-full h-20 rounded-[15px] bg-gray-100 border border-gray-300 text-gray-700 text-xl font-normal flex items-center justify-center"
+              onClick={() => alert('Cancelar')}
+          >
+            Cancelar
+          </button>
+          <button
+              type="button"
+              className="w-full h-20 rounded-[15px] bg-[#9A6D42] hover:bg-[#85582a] text-white text-xl font-normal flex items-center justify-center"
+              onClick={() => alert('Seleccionar membresía')}
+          >
+            Seleccionar Membresía
+          </button>
+          <button
+              type="button"
+              className="w-full h-20 rounded-[15px] bg-[#9A6D42] hover:bg-[#85582a] text-white text-xl font-normal flex items-center justify-center"
+              onClick={() => alert('Opciones de pago')}
+          >
+            Opciones de Pago
+          </button>
+        </div>
 
-      <div className="flex gap-4 pt-4">
-        <button
-          type="submit"
-          disabled={loading}
-          className="bg-amber-600 hover:bg-amber-700 text-white px-6 py-2 rounded"
-        >
-          {loading ? 'Guardando...' : 'Guardar Cliente'}
-        </button>
-        <button
-          type="button"
-          onClick={() => router.push('/')}
-          className="border px-6 py-2 rounded"
-        >
-          Cancelar
-        </button>
-      </div>
-    </form>
+      </form>
   );
 }
+
+// Clase para los inputs: agrégala a tu global.css si no tienes Tailwind JIT
+export const inputFormClass = `
+  input-form
+  block w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-700 
+  focus:outline-none focus:border-[#9A6D42] transition
+  bg-white placeholder-gray-400
+`;
