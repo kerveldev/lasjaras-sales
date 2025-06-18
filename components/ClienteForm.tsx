@@ -1,6 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useCliente } from '../context/ClienteContext'; // ← Importa tu contexto
+import { postCliente } from '../lib/api'; // ← Importa tu función para guardar en backend
 import { UserIcon, EnvelopeIcon, PhoneIcon, PhotoIcon } from '@heroicons/react/24/outline';
 
 const ESTADOS_MEXICO = [
@@ -12,6 +15,9 @@ const ESTADOS_MEXICO = [
 ];
 
 export default function ClienteForm() {
+  const router = useRouter();
+  const { setCliente } = useCliente();
+
   const [form, setForm] = useState({
     nombre: '', apellido: '', nacimiento: '', correo: '', telefono: '',
     direccion: { calle: '', numero: '', ciudad: '', estado: '', pais: 'México', cp: '' },
@@ -56,11 +62,18 @@ export default function ClienteForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
-    setLoading(true);
-    setTimeout(() => {
-      alert('Cliente guardado (demo)');
+    try {
+      setLoading(true);
+      // Prepara data para enviar (puedes enviar foto si lo implementas en tu backend)
+      const cliente = await postCliente(form); // ← AQUÍ guardas en backend
+      setCliente(cliente); // ← Guarda en contexto global
+      router.push('/membresias');
+    } catch (err) {
+      console.error('Error:', err);
+      alert('Ocurrió un error al registrar al cliente.');
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   };
 
   return (
@@ -87,7 +100,6 @@ export default function ClienteForm() {
         </div>
         {/* Foto y datos */}
         <div className="flex flex-col md:flex-row gap-6 md:gap-12 items-start w-full">
-
           {/* Foto */}
           <div className="flex flex-col items-center w-full md:w-1/4 mb-2 md:mb-0">
             <div className="w-28 h-28 rounded-xl border-2 border-dashed flex items-center justify-center bg-gray-50 mb-2 relative">
@@ -140,11 +152,13 @@ export default function ClienteForm() {
             <label className="font-semibold">Correo Electrónico*</label>
             <div className="relative">
               <input
-                  name="correo" type="email"
-                  value={form.correo} onChange={handleInput}
+                  name="correo"
+                  type="email"
+                  value={form.correo}
+                  onChange={handleInput}
                   className={`input-form pl-12 ${errors.correo && 'border-red-400'}`}
               />
-              <EnvelopeIcon className=" left-4 top-1/2 -translate-y-1/2 w-5 h-5 absolute text-gray-400" />
+              <EnvelopeIcon className="left-4 top-1/2 -translate-y-1/2 w-5 h-5 absolute text-gray-400 pointer-events-none" />
             </div>
             {errors.correo && <p className="text-xs text-red-500">{errors.correo}</p>}
           </div>
@@ -153,10 +167,11 @@ export default function ClienteForm() {
             <div className="relative">
               <input
                   name="telefono"
-                  value={form.telefono} onChange={handleInput}
-                  className={`input-form pl-10 ${errors.telefono && 'border-red-400'}`}
+                  value={form.telefono}
+                  onChange={handleInput}
+                  className={`input-form pl-12 ${errors.telefono && 'border-red-400'}`}
               />
-              <PhoneIcon className="w-5 h-5 absolute left-3 top-2.5 text-gray-400" />
+              <PhoneIcon className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
             </div>
             {errors.telefono && <p className="text-xs text-red-500">{errors.telefono}</p>}
           </div>
@@ -232,7 +247,7 @@ export default function ClienteForm() {
           <button
               type="button"
               className="w-full h-20 rounded-[15px] bg-gray-100 border border-gray-300 text-gray-700 text-xl font-normal flex items-center justify-center"
-              onClick={() => alert('Cancelar')}
+              onClick={() => router.push('/')}
           >
             Cancelar
           </button>
@@ -251,12 +266,11 @@ export default function ClienteForm() {
             Opciones de Pago
           </button>
         </div>
-
       </form>
   );
 }
 
-// Clase para los inputs: agrégala a tu global.css si no tienes Tailwind JIT
+// Puedes agregar esto en tu archivo global.css si lo necesitas:
 export const inputFormClass = `
   input-form
   block w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-700 
