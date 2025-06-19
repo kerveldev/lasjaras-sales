@@ -27,11 +27,12 @@ export default function Header() {
                 </div>
                 {/* Menú y acciones */}
                 <div className="hidden md:flex items-center gap-2">
-                    <a href="#" className="px-4 py-2 text-gray-800 font-medium hover:text-[#bb8856] transition">Membresías</a>
-                    <a href="#" className="px-4 py-2 text-gray-800 font-medium hover:text-[#bb8856] transition">Pagos</a>
+                    <a href="/membresias" className="px-4 py-2 text-gray-800 font-medium hover:text-[#bb8856] transition">Membresías</a>
+                    <a href="/pago" className="px-4 py-2 text-gray-800 font-medium hover:text-[#bb8856] transition">Pagos</a>
                     <a href="#" className="px-4 py-2 text-gray-800 font-medium hover:text-[#bb8856] transition">Clientes</a>
                     <button
                         className="ml-6 px-5 py-2 rounded-md text-white bg-[#bb8856] hover:bg-[#a77449] transition font-medium shadow"
+                        onClick={() => window.location.href = '/nuevo'}
                     >
                         Nuevo Cliente
                     </button>
