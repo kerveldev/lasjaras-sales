@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCliente } from '../context/ClienteContext'; // ← Importa tu contexto
 import { postCliente } from '../lib/api'; // ← Importa tu función para guardar en backend
-import { UserIcon, EnvelopeIcon, PhoneIcon, PhotoIcon } from '@heroicons/react/24/outline';
+import { UserIcon, PhotoIcon } from '@heroicons/react/24/outline';
 
 const ESTADOS_MEXICO = [
   'Aguascalientes', 'Baja California', 'Baja California Sur', 'Campeche', 'Chiapas', 'Chihuahua',
