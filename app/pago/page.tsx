@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { ArrowLeftIcon, ExclamationCircleIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
 import Header from "@/components/Header";
+import toast from "react-hot-toast";
 
 const METODOS = [
   {
@@ -61,12 +62,12 @@ export default function PagoPage() {
     if (!cliente || !membresia) return;
     if (metodo === "efectivo") {
       // Simula API real para pago en efectivo
-      alert("Recibo generado correctamente. Status: pendiente");
+      toast.success("Recibo generado correctamente. Status: pendiente");
       router.push("/exito");
       return;
     }
     // Lógica para Openpay/MercadoPago...
-    alert(`Simulando pago con ${metodo === "openpay" ? "Openpay" : "Mercado Pago"}...`);
+    toast.success(`Simulando pago con ${metodo === "openpay" ? "Openpay" : "Mercado Pago"}...`);
     router.push("/exito");
   };
 
