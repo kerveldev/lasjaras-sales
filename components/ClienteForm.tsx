@@ -158,7 +158,7 @@ export default function ClienteForm() {
                   onChange={handleInput}
                   className={`input-form pl-12 ${errors.correo && 'border-red-400'}`}
               />
-              <EnvelopeIcon className="left-4 top-1/2 -translate-y-1/2 w-5 h-5 absolute text-gray-400 pointer-events-none" />
+              {/*<EnvelopeIcon className="left-4 top-1/2 -translate-y-1/2 w-5 h-5 absolute text-gray-400 pointer-events-none" />*/}
             </div>
             {errors.correo && <p className="text-xs text-red-500">{errors.correo}</p>}
           </div>
@@ -171,7 +171,7 @@ export default function ClienteForm() {
                   onChange={handleInput}
                   className={`input-form pl-12 ${errors.telefono && 'border-red-400'}`}
               />
-              <PhoneIcon className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+              {/*<PhoneIcon className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />*/}
             </div>
             {errors.telefono && <p className="text-xs text-red-500">{errors.telefono}</p>}
           </div>
