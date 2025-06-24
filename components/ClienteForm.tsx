@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCliente } from '../context/ClienteContext'; // ← Importa tu contexto
-import { postCliente } from '../lib/api'; // ← Importa tu función para guardar en backend
+import { postCliente } from '../lib/api'; // ← Usa la función de arriba
 import { UserIcon, PhotoIcon } from '@heroicons/react/24/outline';
 
 const ESTADOS_MEXICO = [
@@ -64,9 +64,8 @@ export default function ClienteForm() {
     if (!validate()) return;
     try {
       setLoading(true);
-      // Prepara data para enviar (puedes enviar foto si lo implementas en tu backend)
-      const cliente = await postCliente(form); // ← AQUÍ guardas en backend
-      setCliente(cliente); // ← Guarda en contexto global
+      const cliente = await postCliente(form, foto); // ← Ahora mandas la foto
+      setCliente(cliente);
       router.push('/membresias');
     } catch (err) {
       console.error('Error:', err);
@@ -222,7 +221,6 @@ export default function ClienteForm() {
                 className={`input-form ${errors.pais && 'border-red-400'}`}
             >
               <option value="México">México</option>
-              {/* Puedes agregar más países aquí */}
             </select>
           </div>
           <div>
