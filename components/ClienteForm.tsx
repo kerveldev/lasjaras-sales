@@ -64,6 +64,8 @@ export default function ClienteForm() {
     if (!validate()) return;
     try {
       setLoading(true);
+      console.log("foto", foto);
+
       const cliente = await postCliente(form, foto); // ← Ahora mandas la foto
       setCliente(cliente);
       router.push('/membresias');
