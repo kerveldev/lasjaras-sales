@@ -75,8 +75,12 @@ export default function PagoPage() {
     if (metodo === "efectivo") {
       try {
         const result = await saveSuscripcion(cliente.id, membresia.id);
+        console.log("result", result);
+        localStorage.setItem('qr_code', result.subscription.qr_code);
         toast.success("Suscripción registrada correctamente");
-        router.push("/exito");
+        setTimeout(() => {
+          router.push("/exito");
+        }, 600); // 600ms da tiempo para mostrar el toast
         console.log("Resultado de suscripción:", result);
       } catch (err: any) {
         toast.error("Error al registrar suscripción: " + (err?.message ?? err));

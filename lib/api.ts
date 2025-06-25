@@ -18,7 +18,7 @@ export async function postCliente(form: any, foto: File | null) {
     formData.append('estado', form.direccion.estado);
     formData.append('pais', form.direccion.pais);
     formData.append('cp', form.direccion.cp);
-
+    formData.append('tipo', "membresia");
     // Foto (solo si hay)
     if (foto) {
       formData.append('foto', foto); // El campo debe llamarse igual en el backend

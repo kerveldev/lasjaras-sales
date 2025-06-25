@@ -2,9 +2,10 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useCliente } from '../context/ClienteContext'; // ← Importa tu contexto
+import { useCliente } from '@/context/ClienteContext'; // ← Importa tu contexto
 import { postCliente } from '../lib/api'; // ← Usa la función de arriba
 import { UserIcon, PhotoIcon } from '@heroicons/react/24/outline';
+import Image from "next/image";
 
 const ESTADOS_MEXICO = [
   'Aguascalientes', 'Baja California', 'Baja California Sur', 'Campeche', 'Chiapas', 'Chihuahua',
@@ -105,7 +106,13 @@ export default function ClienteForm() {
           <div className="flex flex-col items-center w-full md:w-1/4 mb-2 md:mb-0">
             <div className="w-28 h-28 rounded-xl border-2 border-dashed flex items-center justify-center bg-gray-50 mb-2 relative">
               {foto ? (
-                  <img src={URL.createObjectURL(foto)} alt="Foto" className="w-full h-full object-cover rounded-xl" />
+                  <Image
+                      src={URL.createObjectURL(foto)}
+                      className="w-10 h-7"
+                      width={200}
+                      height={200}
+                      alt="Foto seleccionada del cliente" // <-- ¡El alt es obligatorio!
+                  />
               ) : (
                   <UserIcon className="w-14 h-14 text-gray-400" />
               )}
